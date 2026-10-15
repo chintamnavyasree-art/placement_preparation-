@@ -110,7 +110,10 @@ export default function SyllabusChecklist() {
     load();
   }, []);
 
-  const toggle = subj => setExpanded(e => ({ ...e, [subj]: !e[subj] }));
+  const toggle = subj => setExpanded(e => ({
+    ...e,
+    [subj]: e[subj] === false ? true : false
+  }));
 
   const toggleAll = expand => {
     const nextState = {};
@@ -373,7 +376,7 @@ export default function SyllabusChecklist() {
             const done = ts.filter(t => t.status === 'Mastered').length;
             const inProg = ts.filter(t => t.status === 'In Progress').length;
             const pct = ts.length > 0 ? Math.round((done / ts.length) * 100) : 0;
-            const isExpanded = !!expanded[subj];
+            const isExpanded = expanded[subj] !== false;
 
             return (
               <div key={subj} className="subject-group-card">
