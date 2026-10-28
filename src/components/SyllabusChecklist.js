@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { getTopics, createTopic, updateTopic, deleteTopic } from '../api/api';
+import { getTopics, createTopic, updateTopic, deleteTopic, DEFAULT_TOPICS } from '../api/api';
 
 const STATUSES = ['Not Started', 'In Progress', 'Mastered'];
 
@@ -94,13 +94,17 @@ export default function SyllabusChecklist() {
     try {
       setLoading(true);
       const { data } = await getTopics();
-      setTopics(data);
+      const validList = Array.isArray(data) && data.length > 0 ? data : (DEFAULT_TOPICS || []);
+      setTopics(validList);
       // Auto-expand all subjects by default for convenience
       const initialExpanded = {};
-      data.forEach(t => { initialExpanded[t.subject] = true; });
+      validList.forEach(t => {
+        if (t && t.subject) initialExpanded[t.subject] = true;
+      });
       setExpanded(initialExpanded);
     } catch {
       setError('Failed to load syllabus topics.');
+      setTopics(DEFAULT_TOPICS || []);
     } finally {
       setLoading(false);
     }

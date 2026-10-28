@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getDrives, createDrive, updateDrive, deleteDrive } from '../api/api';
+import { getDrives, createDrive, updateDrive, deleteDrive, DEFAULT_DRIVES } from '../api/api';
 import PlacementHero from './PlacementHero';
 
 const STATUSES = ['Wishlist','Applied','OA Completed','Interview','Selected','Rejected'];
@@ -24,9 +24,13 @@ export default function PlacementTracker() {
     try {
       setLoading(true);
       const { data } = await getDrives();
-      setDrives(data);
-    } catch { setError('Failed to load drives.'); }
-    finally { setLoading(false); }
+      setDrives(Array.isArray(data) && data.length > 0 ? data : (DEFAULT_DRIVES || []));
+    } catch {
+      setError('Failed to load drives.');
+      setDrives(DEFAULT_DRIVES || []);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { load(); }, []);
@@ -57,7 +61,8 @@ export default function PlacementTracker() {
     catch { setError('Status update failed.'); }
   };
 
-  const statusCounts = STATUSES.reduce((acc,s) => ({ ...acc, [s]: drives.filter(d=>d.status===s).length }), {});
+  const safeDrives = Array.isArray(drives) ? drives : [];
+  const statusCounts = STATUSES.reduce((acc,s) => ({ ...acc, [s]: safeDrives.filter(d=>d.status===s).length }), {});
 
   return (
     <div>

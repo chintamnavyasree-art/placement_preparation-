@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getCoding, updateCoding, createCoding, deleteCoding } from '../api/api';
+import { getCoding, updateCoding, createCoding, deleteCoding, DEFAULT_CODING } from '../api/api';
 
 const PLATFORMS = ['LeetCode','GFG','CodeChef','HackerRank'];
 const DIFFS     = ['Easy','Medium','Hard'];
@@ -12,9 +12,16 @@ export default function CodingProgress() {
   const [form,    setForm]    = useState({ platform:'LeetCode', difficulty:'Easy', count:0 });
 
   const load = async () => {
-    try { setLoading(true); const {data} = await getCoding(); setRows(data); }
-    catch { setError('Failed to load.'); }
-    finally { setLoading(false); }
+    try {
+      setLoading(true);
+      const { data } = await getCoding();
+      setRows(Array.isArray(data) && data.length > 0 ? data : (DEFAULT_CODING || []));
+    } catch {
+      setError('Failed to load.');
+      setRows(DEFAULT_CODING || []);
+    } finally {
+      setLoading(false);
+    }
   };
   useEffect(() => { load(); }, []);
 
@@ -35,9 +42,10 @@ export default function CodingProgress() {
     catch { setError('Delete failed.'); }
   };
 
-  const grouped = rows.reduce((acc, r) => { if (!acc[r.platform]) acc[r.platform]=[]; acc[r.platform].push(r); return acc; }, {});
-  const totals  = DIFFS.map(d => ({ d, v: rows.filter(r=>r.difficulty===d).reduce((s,r)=>s+r.count,0) }));
-  const grand   = rows.reduce((s,r)=>s+r.count,0);
+  const safeRows = Array.isArray(rows) ? rows : [];
+  const grouped = safeRows.reduce((acc, r) => { if (!acc[r.platform]) acc[r.platform]=[]; acc[r.platform].push(r); return acc; }, {});
+  const totals  = DIFFS.map(d => ({ d, v: safeRows.filter(r=>r.difficulty===d).reduce((s,r)=>s+(r.count||0),0) }));
+  const grand   = safeRows.reduce((s,r)=>s+(r.count||0),0);
 
   return (
     <div>

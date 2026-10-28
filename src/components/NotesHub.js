@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getNotes, createNote, deleteNote } from '../api/api';
+import { getNotes, createNote, deleteNote, DEFAULT_NOTES } from '../api/api';
 
 const EMPTY = { title:'', content:'', category:'General' };
 
@@ -13,13 +13,21 @@ export default function NotesHub() {
   const [filter,  setFilter]  = useState('');
 
   const load = async (cat) => {
-    try { setLoading(true); const {data} = await getNotes(cat); setNotes(data); }
-    catch { setError('Failed to load notes.'); }
-    finally { setLoading(false); }
+    try {
+      setLoading(true);
+      const { data } = await getNotes(cat);
+      setNotes(Array.isArray(data) && data.length > 0 ? data : (DEFAULT_NOTES || []));
+    } catch {
+      setError('Failed to load notes.');
+      setNotes(DEFAULT_NOTES || []);
+    } finally {
+      setLoading(false);
+    }
   };
   useEffect(() => { load(); }, []);
 
-  const categories = [...new Set(notes.map(n=>n.category))];
+  const safeNotes = Array.isArray(notes) ? notes : [];
+  const categories = [...new Set(safeNotes.map(n=>n.category).filter(Boolean))];
 
   const handleFilter = cat => { setFilter(cat); load(cat||undefined); };
 

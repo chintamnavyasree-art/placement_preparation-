@@ -8,7 +8,7 @@ const api = axios.create({
 });
 
 // ── DEFAULT SEED DATA (Used when backend is offline or for standalone mode) ──
-const DEFAULT_TOPICS = [
+export const DEFAULT_TOPICS = [
   // ── QUANTITATIVE APTITUDE ──
   { id: 1, subject: 'Quantitative Aptitude', topic: 'Number Systems, Divisibility & Remainder Theorem', status: 'Mastered', created_at: new Date().toISOString() },
   { id: 2, subject: 'Quantitative Aptitude', topic: 'Percentages, Profit & Loss, Discounts', status: 'Mastered', created_at: new Date().toISOString() },
@@ -104,14 +104,14 @@ const DEFAULT_TOPICS = [
   { id: 74, subject: 'Web Development', topic: 'User Authentication: JWT, Cookies, Sessions & CORS Policies', status: 'In Progress', created_at: new Date().toISOString() }
 ];
 
-const DEFAULT_DRIVES = [
+export const DEFAULT_DRIVES = [
   { id: 1, company: 'Google', role: 'Software Engineer', package: '32 LPA', status: 'Applied', interview_date: '2026-11-20', notes: 'Prepare DSA Graphs & DP thoroughly', created_at: new Date().toISOString() },
   { id: 2, company: 'Microsoft', role: 'Software Engineer - 1', package: '28 LPA', status: 'Interview', interview_date: '2026-10-28', notes: 'Round 1 System Design scheduled', created_at: new Date().toISOString() },
   { id: 3, company: 'Amazon', role: 'SDE-1', package: '25 LPA', status: 'OA Completed', interview_date: null, notes: 'Completed HackerRank OA, waiting for results', created_at: new Date().toISOString() },
   { id: 4, company: 'Atlassian', role: 'Graduate Engineer', package: '36 LPA', status: 'Wishlist', interview_date: null, notes: 'Referral requested on LinkedIn', created_at: new Date().toISOString() }
 ];
 
-const DEFAULT_CODING = [
+export const DEFAULT_CODING = [
   { id: 1, platform: 'LeetCode', difficulty: 'Easy', count: 145, updated_at: new Date().toISOString() },
   { id: 2, platform: 'LeetCode', difficulty: 'Medium', count: 98, updated_at: new Date().toISOString() },
   { id: 3, platform: 'LeetCode', difficulty: 'Hard', count: 24, updated_at: new Date().toISOString() },
@@ -120,7 +120,7 @@ const DEFAULT_CODING = [
   { id: 6, platform: 'GFG', difficulty: 'Hard', count: 12, updated_at: new Date().toISOString() }
 ];
 
-const DEFAULT_NOTES = [
+export const DEFAULT_NOTES = [
   { id: 1, title: 'Top 10 DBMS Revision Points', content: '1. ACID Properties: Atomicity, Consistency, Isolation, Durability\n2. 2NF removes partial dependency, 3NF removes transitive dependency\n3. Clustered index sorts physical data rows, Non-clustered creates separate index pointers\n4. INNER JOIN vs LEFT JOIN differences', category: 'DBMS', created_at: new Date().toISOString() },
   { id: 2, title: 'OS Process vs Thread', content: '• Process has its own address space, memory, file descriptors\n• Threads share memory of the parent process (faster context switching)\n• IPC mechanisms: Pipes, Shared Memory, Message Queues, Sockets', category: 'OS', created_at: new Date().toISOString() },
   { id: 3, title: 'Amazon Leadership Principles Checklist', content: 'Customer Obsession, Ownership, Bias for Action, Deliver Results. Prepare STAR format answers with specific metrics for each.', category: 'Amazon', created_at: new Date().toISOString() }
@@ -134,7 +134,14 @@ function getLocal(key, defaultVal) {
       localStorage.setItem(key, JSON.stringify(defaultVal));
       return defaultVal;
     }
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(defaultVal) && defaultVal.length > 0) {
+      if (!Array.isArray(parsed) || parsed.length === 0) {
+        localStorage.setItem(key, JSON.stringify(defaultVal));
+        return defaultVal;
+      }
+    }
+    return parsed;
   } catch {
     return defaultVal;
   }

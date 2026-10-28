@@ -30,10 +30,10 @@ export default function HomePage({ onNavigate }) {
           getNotes()
         ]);
 
-        const drives = drivesRes.status === 'fulfilled' ? drivesRes.value.data : [];
-        const topics = topicsRes.status === 'fulfilled' ? topicsRes.value.data : [];
-        const coding = codingRes.status === 'fulfilled' ? codingRes.value.data : [];
-        const notes = notesRes.status === 'fulfilled' ? notesRes.value.data : [];
+        const drives = drivesRes.status === 'fulfilled' && Array.isArray(drivesRes.value?.data) ? drivesRes.value.data : [];
+        const topics = topicsRes.status === 'fulfilled' && Array.isArray(topicsRes.value?.data) ? topicsRes.value.data : [];
+        const coding = codingRes.status === 'fulfilled' && Array.isArray(codingRes.value?.data) ? codingRes.value.data : [];
+        const notes = notesRes.status === 'fulfilled' && Array.isArray(notesRes.value?.data) ? notesRes.value.data : [];
 
         const interviews = drives.filter(d => d.status === 'Interview' || d.status === 'Selected').length;
         const mastered = topics.filter(t => t.status === 'Mastered').length;
