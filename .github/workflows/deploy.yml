@@ -32,7 +32,7 @@ jobs:
           cache: 'npm'
 
       - name: Install Frontend Dependencies
-        run: npm ci
+        run: npm install --legacy-peer-deps
 
       - name: Build Production Web App
         run: npm run build
@@ -42,7 +42,7 @@ jobs:
       - name: Verify Backend Integrity
         run: |
           cd backend
-          npm ci
+          npm install
           node -c server.js
           node -c config/db.js
           node -c controllers/drivesController.js
